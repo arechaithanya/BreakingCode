@@ -66,6 +66,24 @@ body {
   z-index: -1;
 }
 
+/* Snap section that grows with content (for tall sections like FAQ, Pricing) */
+.snap-section-auto {
+  min-height: 100vh;
+  scroll-snap-align: start;
+  position: relative;
+}
+
+/* Marquee animation for testimonials */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+}
+
 /* React Bits Style Utilities */
 .react-bits-card {
   @apply bg-[#080808] border border-white/5 rounded-2xl shadow-lg transition-all duration-300;
