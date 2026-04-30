@@ -1,6 +1,6 @@
 // components/DitherBackground.tsx
 import React from "react";
-import Dither from "./react-bits/dither";
+import Dither from "../react-bits/dither";
 
 type DitherBackgroundProps = {
   children?: React.ReactNode;

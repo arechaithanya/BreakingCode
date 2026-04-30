@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Send, Globe, MessageCircle, ExternalLink } from 'lucide-react';
-import breakingCodeLogo from '../assets/breaking-code-logo.jpeg';
+import breakingCodeLogo from '../../assets/breaking-code-logo.jpeg';
 
 const socialLinks = [
   { icon: <ExternalLink className="w-5 h-5" />, label: 'GitHub', href: 'https://github.com' },

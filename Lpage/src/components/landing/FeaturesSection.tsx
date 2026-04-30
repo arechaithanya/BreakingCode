@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Code, Bot, Eye, Globe, Cpu, Layout } from 'lucide-react';
-import breakingCodeLogo from '../assets/breaking-code-logo.jpeg';
+import breakingCodeLogo from '../../assets/breaking-code-logo.jpeg';
 
 const FeaturesSection: React.FC = () => {
   const features = [

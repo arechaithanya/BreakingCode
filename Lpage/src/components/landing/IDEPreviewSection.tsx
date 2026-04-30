@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Play, Shield, Zap, Terminal } from 'lucide-react';
-import breakingCodeLogo from '../assets/breaking-code-logo.jpeg';
-
-const draftIdeUrl = import.meta.env.VITE_DRAFT04_URL ?? 'http://localhost:3000/ide';
+import { useNavigate } from 'react-router-dom';
+import breakingCodeLogo from '../../assets/breaking-code-logo.jpeg';
 
 const IDEPreviewSection: React.FC = () => {
+  const navigate = useNavigate();
+
   return (
     <section id="ide-preview" className="snap-section flex flex-col items-center justify-center bg-devmind-dark px-6 py-20">
       <div className="max-w-7xl w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -49,8 +50,8 @@ const IDEPreviewSection: React.FC = () => {
             ))}
           </div>
 
-          <button 
-            onClick={() => window.location.href = draftIdeUrl}
+          <button
+            onClick={() => navigate('/ide')}
             className="group relative px-8 py-4 bg-devmind-purple rounded-xl font-bold overflow-hidden transition-all hover:pr-12"
           >
             <span className="relative z-10 flex items-center gap-2">

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import DitherBackground from './DitherBackground';
-import breakingCodeLogo from '../assets/breaking-code-logo.jpeg';
+import DitherBackground from '../common/DitherBackground';
+import breakingCodeLogo from '../../assets/breaking-code-logo.jpeg';
 
 const HeroSection: React.FC = () => {
   return (
