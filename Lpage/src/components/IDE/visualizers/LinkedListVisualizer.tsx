@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import type { LinkedListStepData } from '../../utils/codeAnalyzer';
+import type { LinkedListStepData } from '../../../utils/codeAnalyzer';
 
 interface Props {
   data: LinkedListStepData;

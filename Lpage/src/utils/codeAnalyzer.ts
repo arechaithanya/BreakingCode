@@ -100,12 +100,20 @@ function detectArrayPatterns(code: string, lang: string): DetectedPattern[] {
   }
 
   // Sorting detection
-  if (/\.sort\(/.test(code) || /sorted\(/.test(code) ||
-      /bubble.?sort|selection.?sort|insertion.?sort|merge.?sort|quick.?sort/i.test(code)) {
+  const sortMatch = code.match(/bubble.?sort|selection.?sort|insertion.?sort|merge.?sort|quick.?sort|\.sort\(|sorted\(/i);
+  if (sortMatch) {
+    let sortAction = 'bubblesort'; // default
+    const matchStr = sortMatch[0].toLowerCase();
+    if (matchStr.includes('selection')) sortAction = 'selectionsort';
+    else if (matchStr.includes('insertion')) sortAction = 'insertionsort';
+    else if (matchStr.includes('merge')) sortAction = 'mergesort';
+    else if (matchStr.includes('quick')) sortAction = 'quicksort';
+    else if (matchStr.includes('bubble')) sortAction = 'bubblesort';
+
     patterns.push({
       type: 'array',
-      match: code.match(/sort/i)!,
-      details: { action: 'sort' },
+      match: sortMatch as any,
+      details: { action: sortAction },
     });
   }
 
@@ -260,35 +268,217 @@ function generateArraySteps(
       });
       time.current += 600;
 
-      // If sorting detected, simulate bubble sort steps
-      if ((p.details.action as string) === 'sort' || patterns.some(pp => pp.details.action === 'sort')) {
-        const arr = [...values];
-        for (let i = 0; i < Math.min(arr.length, 6); i++) {
-          for (let j = 0; j < arr.length - i - 1; j++) {
-            // Compare step
-            steps.push({
-              id: stepId.current++,
-              type: 'array',
-              label: `Compare ${name}[${j}] and ${name}[${j + 1}]`,
-              description: `Comparing ${arr[j]} with ${arr[j + 1]}`,
-              timestamp: time.current,
-              data: { kind: 'array', name, values: [...arr], highlightIndices: [j, j + 1], swapIndices: null, action: 'compare' },
-            });
-            time.current += 400;
+      // Check which sort is detected globally
+      const sortPattern = patterns.find(pp => pp.details.action && String(pp.details.action).endsWith('sort'));
+      const sortType = (p.details.action as string)?.endsWith('sort') ? p.details.action : sortPattern?.details.action;
 
-            if (arr[j] > arr[j + 1]) {
-              [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+      if (sortType) {
+        const arr = [...values];
+        
+        if (sortType === 'bubblesort') {
+          for (let i = 0; i < arr.length; i++) {
+            for (let j = 0; j < arr.length - i - 1; j++) {
+              // Compare step
               steps.push({
                 id: stepId.current++,
                 type: 'array',
-                label: `Swap ${name}[${j}] ↔ ${name}[${j + 1}]`,
-                description: `Swapping ${arr[j + 1]} and ${arr[j]}`,
+                label: `Compare ${name}[${j}] and ${name}[${j + 1}]`,
+                description: `Comparing ${arr[j]} with ${arr[j + 1]}`,
                 timestamp: time.current,
-                data: { kind: 'array', name, values: [...arr], highlightIndices: [j, j + 1], swapIndices: [j, j + 1], action: 'swap' },
+                data: { kind: 'array', name, values: [...arr], highlightIndices: [j, j + 1], swapIndices: null, action: 'compare' },
+              });
+              time.current += 400;
+
+              if (arr[j] > arr[j + 1]) {
+                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+                steps.push({
+                  id: stepId.current++,
+                  type: 'array',
+                  label: `Swap ${name}[${j}] ↔ ${name}[${j + 1}]`,
+                  description: `Swapping ${arr[j + 1]} and ${arr[j]}`,
+                  timestamp: time.current,
+                  data: { kind: 'array', name, values: [...arr], highlightIndices: [j, j + 1], swapIndices: [j, j + 1], action: 'swap' },
+                });
+                time.current += 500;
+              }
+            }
+          }
+        } else if (sortType === 'selectionsort') {
+          for (let i = 0; i < arr.length - 1; i++) {
+            let minIdx = i;
+            for (let j = i + 1; j < arr.length; j++) {
+              steps.push({
+                id: stepId.current++,
+                type: 'array',
+                label: `Compare ${name}[${j}] and ${name}[${minIdx}]`,
+                description: `Comparing ${arr[j]} with current min ${arr[minIdx]}`,
+                timestamp: time.current,
+                data: { kind: 'array', name, values: [...arr], highlightIndices: [j, minIdx], swapIndices: null, action: 'compare' },
+              });
+              time.current += 400;
+              if (arr[j] < arr[minIdx]) {
+                minIdx = j;
+              }
+            }
+            if (minIdx !== i) {
+              [arr[i], arr[minIdx]] = [arr[minIdx], arr[i]];
+              steps.push({
+                id: stepId.current++,
+                type: 'array',
+                label: `Swap ${name}[${i}] ↔ ${name}[${minIdx}]`,
+                description: `Swapping ${arr[i]} and ${arr[minIdx]}`,
+                timestamp: time.current,
+                data: { kind: 'array', name, values: [...arr], highlightIndices: [i, minIdx], swapIndices: [i, minIdx], action: 'swap' },
               });
               time.current += 500;
             }
           }
+        } else if (sortType === 'insertionsort') {
+          for (let i = 1; i < arr.length; i++) {
+            let key = arr[i];
+            let j = i - 1;
+            while (j >= 0 && arr[j] > key) {
+              steps.push({
+                id: stepId.current++,
+                type: 'array',
+                label: `Compare ${name}[${j}] and key ${key}`,
+                description: `Comparing ${arr[j]} with ${key}`,
+                timestamp: time.current,
+                data: { kind: 'array', name, values: [...arr], highlightIndices: [j, j + 1], swapIndices: null, action: 'compare' },
+              });
+              time.current += 400;
+
+              arr[j + 1] = arr[j];
+              steps.push({
+                id: stepId.current++,
+                type: 'array',
+                label: `Move ${name}[${j}] to ${name}[${j + 1}]`,
+                description: `Moving ${arr[j]} to index ${j + 1}`,
+                timestamp: time.current,
+                data: { kind: 'array', name, values: [...arr], highlightIndices: [j + 1], swapIndices: null, action: 'set' },
+              });
+              time.current += 400;
+              j = j - 1;
+            }
+            arr[j + 1] = key;
+            steps.push({
+              id: stepId.current++,
+              type: 'array',
+              label: `Insert key ${key} at ${name}[${j + 1}]`,
+              description: `Inserting ${key} at index ${j + 1}`,
+              timestamp: time.current,
+              data: { kind: 'array', name, values: [...arr], highlightIndices: [j + 1], swapIndices: null, action: 'set' },
+            });
+            time.current += 400;
+          }
+        } else if (sortType === 'mergesort') {
+          const mergeSortHelper = (start: number, end: number) => {
+            if (start >= end) return;
+            const mid = Math.floor((start + end) / 2);
+            mergeSortHelper(start, mid);
+            mergeSortHelper(mid + 1, end);
+            
+            let left = start;
+            let right = mid + 1;
+            const temp: number[] = [];
+            
+            while (left <= mid && right <= end) {
+              steps.push({
+                id: stepId.current++,
+                type: 'array',
+                label: `Compare ${name}[${left}] and ${name}[${right}]`,
+                description: `Merging: Comparing ${arr[left]} with ${arr[right]}`,
+                timestamp: time.current,
+                data: { kind: 'array', name, values: [...arr], highlightIndices: [left, right], swapIndices: null, action: 'compare' },
+              });
+              time.current += 400;
+              
+              if (arr[left] <= arr[right]) {
+                temp.push(arr[left++]);
+              } else {
+                temp.push(arr[right++]);
+              }
+            }
+            while (left <= mid) temp.push(arr[left++]);
+            while (right <= end) temp.push(arr[right++]);
+            
+            for (let i = 0; i < temp.length; i++) {
+              arr[start + i] = temp[i];
+              steps.push({
+                id: stepId.current++,
+                type: 'array',
+                label: `Update ${name}[${start + i}]`,
+                description: `Setting value to ${temp[i]} from merged array`,
+                timestamp: time.current,
+                data: { kind: 'array', name, values: [...arr], highlightIndices: [start + i], swapIndices: null, action: 'set' },
+              });
+              time.current += 400;
+            }
+          };
+          mergeSortHelper(0, arr.length - 1);
+        } else if (sortType === 'quicksort') {
+          const quickSortHelper = (low: number, high: number) => {
+            if (low < high) {
+              const pivot = arr[high];
+              let i = low - 1;
+              
+              steps.push({
+                id: stepId.current++,
+                type: 'array',
+                label: `Pivot chosen: ${pivot}`,
+                description: `Partitioning with pivot ${pivot} at index ${high}`,
+                timestamp: time.current,
+                data: { kind: 'array', name, values: [...arr], highlightIndices: [high], swapIndices: null, action: 'access' },
+              });
+              time.current += 400;
+
+              for (let j = low; j < high; j++) {
+                steps.push({
+                  id: stepId.current++,
+                  type: 'array',
+                  label: `Compare ${name}[${j}] with pivot ${pivot}`,
+                  description: `Comparing ${arr[j]} with ${pivot}`,
+                  timestamp: time.current,
+                  data: { kind: 'array', name, values: [...arr], highlightIndices: [j, high], swapIndices: null, action: 'compare' },
+                });
+                time.current += 400;
+
+                if (arr[j] < pivot) {
+                  i++;
+                  if (i !== j) {
+                    [arr[i], arr[j]] = [arr[j], arr[i]];
+                    steps.push({
+                      id: stepId.current++,
+                      type: 'array',
+                      label: `Swap ${name}[${i}] ↔ ${name}[${j}]`,
+                      description: `Swapping ${arr[j]} and ${arr[i]}`,
+                      timestamp: time.current,
+                      data: { kind: 'array', name, values: [...arr], highlightIndices: [i, j], swapIndices: [i, j], action: 'swap' },
+                    });
+                    time.current += 500;
+                  }
+                }
+              }
+              
+              if (i + 1 !== high) {
+                [arr[i + 1], arr[high]] = [arr[high], arr[i + 1]];
+                steps.push({
+                  id: stepId.current++,
+                  type: 'array',
+                  label: `Swap pivot to ${name}[${i + 1}]`,
+                  description: `Swapping pivot ${arr[i + 1]} and ${arr[high]}`,
+                  timestamp: time.current,
+                  data: { kind: 'array', name, values: [...arr], highlightIndices: [i + 1, high], swapIndices: [i + 1, high], action: 'swap' },
+                });
+                time.current += 500;
+              }
+              
+              const pi = i + 1;
+              quickSortHelper(low, pi - 1);
+              quickSortHelper(pi + 1, high);
+            }
+          };
+          quickSortHelper(0, arr.length - 1);
         }
 
         // Final sorted state
