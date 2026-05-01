@@ -10,6 +10,7 @@ import NL2CodeBar from '../components/IDE/NL2CodeBar';
 import BugFixPanel from '../components/IDE/BugFixPanel';
 import CodeVisualizer from '../components/IDE/CodeVisualizer';
 import { executeCode, formatOutput, LANGUAGE_IDS, type SubmissionResponse } from '../services/judge0Service';
+import { explainError } from '../services/aiAnalysisService';
 import type { Bug } from '../types/ide';
 
 // Extended AI Analysis types
@@ -24,6 +25,8 @@ interface AIAnalysis {
   suggestions: string[];
   errors: string[];
   optimizations: string[];
+  errorExplanation?: string;
+  suggestedCorrection?: string;
 }
 
 const IDEPage: React.FC = () => {
@@ -106,6 +109,13 @@ console.log(fibonacci(10));`);
     setDismissedBugIds(prev => new Set(prev).add(bugId));
   }, []);
 
+  const handleApplyAICorrection = useCallback(() => {
+    if (aiAnalysis?.suggestedCorrection) {
+      setCode(aiAnalysis.suggestedCorrection);
+      setStatus('idle');
+    }
+  }, [aiAnalysis]);
+
   // Reset dismissed bugs when code changes significantly
   useEffect(() => {
     if (Math.abs(code.length - previousCodeLength) > 50) {
@@ -162,81 +172,93 @@ console.log(fibonacci(10));`);
     }
   }, [code, language, input]);
 
-  // AI Code Analysis (mock implementation)
-  const analyzeCode = useCallback((sourceCode: string, lang: string, result: SubmissionResponse) => {
+  // AI Code Analysis
+  const analyzeCode = useCallback(async (sourceCode: string, lang: string, result: SubmissionResponse) => {
     setIsAnalyzing(true);
     
-    // Simulate AI analysis delay
-    setTimeout(() => {
-      // Detect patterns for complexity analysis
-      const hasLoop = /for\s*\(|while\s*\(|forEach|map|filter|reduce/.test(sourceCode);
-      const hasNestedLoop = /for\s*\([^)]*\)\s*{[^}]*for\s*\(/.test(sourceCode);
-      const hasRecursion = /function\s+\w+\s*\([^)]*\)[^{]*\{[^}]*\w+\s*\([^)]*\)/.test(sourceCode);
-      
-      let timeComp = 'O(1)';
-      let spaceComp = 'O(1)';
-      
-      if (hasNestedLoop) {
-        timeComp = 'O(n²)';
-        spaceComp = 'O(n)';
-      } else if (hasRecursion) {
-        timeComp = 'O(2ⁿ) or O(n!)';
-        spaceComp = 'O(n) - call stack';
-      } else if (hasLoop) {
-        timeComp = 'O(n)';
-        spaceComp = 'O(1)';
-      }
-      
-      setComplexity({
-        timeComplexity: timeComp,
-        spaceComplexity: spaceComp,
-        explanation: hasRecursion 
-          ? 'Recursive algorithm detected. Time complexity grows exponentially with input size.'
-          : hasNestedLoop 
-            ? 'Nested loops detected. Quadratic time complexity.'
-            : hasLoop 
-              ? 'Linear iteration detected. Time grows proportionally with input.'
-              : 'Constant time operations. No iteration or recursion detected.'
-      });
-      
-      // Generate AI analysis
-      const suggestions: string[] = [];
-      const optimizations: string[] = [];
-      const errors: string[] = [];
-      
-      if (result.status.id !== 3) {
-        errors.push(`Execution failed with status: ${result.status.description}`);
-      }
-      
-      if (hasRecursion) {
-        suggestions.push('Consider memoization to optimize recursive calls');
-        optimizations.push('Use dynamic programming to reduce time complexity');
-      }
-      
-      if (hasNestedLoop && sourceCode.includes('Array')) {
-        optimizations.push('Consider using hash maps for O(1) lookups');
-      }
-      
-      if (!sourceCode.includes('//') && sourceCode.length > 200) {
-        suggestions.push('Add comments to improve code readability');
-      }
-      
-      if (!/const|let/.test(sourceCode) && lang === 'javascript') {
-        suggestions.push('Use const/let instead of var for better scoping');
-      }
-      
-      setAiAnalysis({
-        summary: result.status.id === 3 
-          ? 'Code executed successfully. Analysis complete.'
-          : 'Code execution failed. Review errors below.',
-        suggestions,
-        errors: result.stderr ? [result.stderr, ...errors] : errors,
-        optimizations
-      });
-      
-      setIsAnalyzing(false);
-      setShowAIAnalysis(true);
-    }, 1500);
+    // Simulate some latency for the initial patterns
+    await new Promise(resolve => setTimeout(resolve, 800));
+
+    // Detect patterns for complexity analysis
+    const hasLoop = /for\s*\(|while\s*\(|forEach|map|filter|reduce/.test(sourceCode);
+    const hasNestedLoop = /for\s*\([^)]*\)\s*{[^}]*for\s*\(/.test(sourceCode);
+    const hasRecursion = /function\s+\w+\s*\([^)]*\)[^{]*\{[^}]*\w+\s*\([^)]*\)/.test(sourceCode);
+    
+    let timeComp = 'O(1)';
+    let spaceComp = 'O(1)';
+    
+    if (hasNestedLoop) {
+      timeComp = 'O(n²)';
+      spaceComp = 'O(n)';
+    } else if (hasRecursion) {
+      timeComp = 'O(2ⁿ) or O(n!)';
+      spaceComp = 'O(n) - call stack';
+    } else if (hasLoop) {
+      timeComp = 'O(n)';
+      spaceComp = 'O(1)';
+    }
+    
+    setComplexity({
+      timeComplexity: timeComp,
+      spaceComplexity: spaceComp,
+      explanation: hasRecursion 
+        ? 'Recursive algorithm detected. Time complexity grows exponentially with input size.'
+        : hasNestedLoop 
+          ? 'Nested loops detected. Quadratic time complexity.'
+          : hasLoop 
+            ? 'Linear iteration detected. Time grows proportionally with input.'
+            : 'Constant time operations. No iteration or recursion detected.'
+    });
+    
+    // Generate AI analysis
+    const suggestions: string[] = [];
+    const optimizations: string[] = [];
+    const errors: string[] = [];
+    
+    if (result.status.id !== 3) {
+      errors.push(`Execution failed with status: ${result.status.description}`);
+    }
+    
+    if (hasRecursion) {
+      suggestions.push('Consider memoization to optimize recursive calls');
+      optimizations.push('Use dynamic programming to reduce time complexity');
+    }
+    
+    if (hasNestedLoop && sourceCode.includes('Array')) {
+      optimizations.push('Consider using hash maps for O(1) lookups');
+    }
+    
+    if (!sourceCode.includes('//') && sourceCode.length > 200) {
+      suggestions.push('Add comments to improve code readability');
+    }
+    
+    if (!/const|let/.test(sourceCode) && lang === 'javascript') {
+      suggestions.push('Use const/let instead of var for better scoping');
+    }
+
+    // Get AI error insight if there's an error
+    let errorExplanation = undefined;
+    let suggestedCorrection = undefined;
+
+    if (result.status.id !== 3) {
+      const insight = await explainError(sourceCode, lang, result.stderr || result.status.description);
+      errorExplanation = insight.explanation;
+      suggestedCorrection = insight.correction;
+    }
+    
+    setAiAnalysis({
+      summary: result.status.id === 3 
+        ? 'Code executed successfully. Analysis complete.'
+        : 'Code execution failed. Review AI insight below.',
+      suggestions,
+      errors: result.stderr ? [result.stderr, ...errors] : errors,
+      optimizations,
+      errorExplanation,
+      suggestedCorrection
+    });
+    
+    setIsAnalyzing(false);
+    setShowAIAnalysis(true);
   }, []);
 
   // Reset
@@ -531,6 +553,36 @@ function example() {
                             </li>
                           ))}
                         </ul>
+                      </div>
+                    )}
+
+                    {/* AI Error Insight */}
+                    {aiAnalysis.errorExplanation && (
+                      <div className="bg-[#1e293b] border border-blue-500/30 rounded-lg p-3 space-y-3">
+                        <div className="flex items-center gap-2 text-sm font-medium text-blue-400">
+                          <Brain className="w-4 h-4" />
+                          AI Error Insight
+                        </div>
+                        <p className="text-xs text-gray-300 leading-relaxed">
+                          {aiAnalysis.errorExplanation}
+                        </p>
+                        
+                        {aiAnalysis.suggestedCorrection && (
+                          <div className="space-y-2">
+                            <div className="text-[10px] uppercase tracking-wider text-gray-500 font-bold">Suggested Correction</div>
+                            <div className="relative group">
+                              <pre className="bg-[#0f172a] rounded p-2 text-xs font-mono text-emerald-400 overflow-x-auto max-h-40">
+                                {aiAnalysis.suggestedCorrection}
+                              </pre>
+                              <button
+                                onClick={handleApplyAICorrection}
+                                className="absolute top-2 right-2 px-2 py-1 bg-emerald-600/20 hover:bg-emerald-600/40 border border-emerald-500/30 rounded text-[10px] text-emerald-400 transition-colors"
+                              >
+                                Apply Fix
+                              </button>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </motion.div>
