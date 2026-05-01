@@ -24,7 +24,7 @@ export async function explainError(
   }
 
   try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
     const prompt = `
       As an expert programming assistant, analyze the following code and the resulting error.
