@@ -8,7 +8,7 @@
  * Dependencies: userProfile.ts (for UserProfile type)
  */
 
-import type { UserProfile, SkillLevel } from './userProfile';
+import type { UserProfile } from './userProfile';
 import { inferSkillLevel } from './userProfile';
 
 export type ProblemDifficulty = 'easy' | 'medium' | 'hard';
@@ -225,7 +225,7 @@ export const PROBLEM_CATALOG: Problem[] = [
 export const recommendProblems = (profile: UserProfile, count: number = 3): RecommendationScore[] => {
   const userSkillLevel = inferSkillLevel(profile);
   const recentSuccessRate = profile.difficultyHistory.length > 0 
-    ? profile.problemsSolved / profile.difficultyHistory.length 
+    ? profile.solvedProblems.length / profile.difficultyHistory.length 
     : 0;
   
   const scoredProblems = PROBLEM_CATALOG.map(problem => {

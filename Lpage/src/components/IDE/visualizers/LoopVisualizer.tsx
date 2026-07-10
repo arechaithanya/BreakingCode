@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import type { LoopStepData } from '../../utils/codeAnalyzer';
+import type { LoopStepData } from '../../../utils/codeAnalyzer';
 
 interface Props {
   data: LoopStepData;

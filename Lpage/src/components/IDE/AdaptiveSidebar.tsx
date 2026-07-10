@@ -8,8 +8,8 @@
  */
 
 import React, { useMemo } from 'react';
-import { useUserProfile } from '../../context/UserProfileContext';
-import { inferSkillLevel, getTopicMasteryLevel } from '../../ml/userProfile';
+import { useAuth } from '../../context/AuthContext';
+import { inferSkillLevel } from '../../ml/userProfile';
 import { recommendProblems, explainRecommendation } from '../../ml/recommender';
 import type { Problem } from '../../ml/recommender';
 
@@ -138,13 +138,15 @@ const ProblemCard: React.FC<{ problem: Problem; explanation: string }> = ({ prob
  * Main AdaptiveSidebar component
  */
 const AdaptiveSidebar: React.FC = () => {
-  const { profile } = useUserProfile();
+  const { profile } = useAuth();
 
-  const skillLevel = useMemo(() => inferSkillLevel(profile), [profile]);
+  const skillLevel = useMemo(() => profile ? inferSkillLevel(profile) : 'beginner', [profile]);
   
   const recommendations = useMemo(() => {
-    return recommendProblems(profile, 3);
+    return profile ? recommendProblems(profile, 3) : [];
   }, [profile]);
+
+  if (!profile) return null;
 
   return (
     <div className="w-80 bg-gray-900 border-l border-gray-800 p-4 overflow-y-auto h-full">
@@ -168,7 +170,7 @@ const AdaptiveSidebar: React.FC = () => {
         <div className="grid grid-cols-2 gap-4">
           <div className="bg-gray-800 rounded-lg p-3">
             <div className="text-2xl font-bold text-devmind-cyan">
-              {profile.problemsSolved}
+              {profile.solvedProblems.length}
             </div>
             <div className="text-xs text-gray-400">Problems Solved</div>
           </div>
@@ -191,7 +193,7 @@ const AdaptiveSidebar: React.FC = () => {
           
           {recommendations.length > 0 ? (
             <div className="space-y-3">
-              {recommendations.map(({ problem, score }) => (
+              {recommendations.map(({ problem }) => (
                 <ProblemCard
                   key={problem.id}
                   problem={problem}
@@ -211,7 +213,7 @@ const AdaptiveSidebar: React.FC = () => {
           <div>
             <h4 className="text-sm font-medium text-gray-300 mb-3">Recent Topics</h4>
             <div className="flex flex-wrap gap-2">
-              {profile.recentTopics.slice(0, 5).map((topic, index) => (
+              {profile.recentTopics.slice(0, 5).map((topic: string, index: number) => (
                 <span
                   key={index}
                   className="px-2 py-1 bg-gray-800 text-gray-400 text-xs rounded"

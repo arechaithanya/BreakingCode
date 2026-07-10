@@ -12,7 +12,13 @@ export default {
           purple: "#A020F0",
           dark: "#050505",
           glass: "rgba(255, 255, 255, 0.05)",
+        },
+        emerald: {
+          500: "#00ff88",
         }
+      },
+      fontFamily: {
+        mono: ['"Fira Code"', 'monospace'],
       },
       animation: {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',

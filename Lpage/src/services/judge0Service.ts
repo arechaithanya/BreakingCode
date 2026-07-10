@@ -4,7 +4,9 @@
  * Uses the free public instance at ce.judge0.com — no API key required.
  */
 
-const JUDGE0_API_URL = 'https://ce.judge0.com';
+const JUDGE0_API_URL = import.meta.env.VITE_JUDGE0_API_URL || 'https://ce.judge0.com';
+const JUDGE0_API_KEY = import.meta.env.VITE_JUDGE0_API_KEY || '';
+const JUDGE0_API_HOST = import.meta.env.VITE_JUDGE0_API_HOST || '';
 
 // Language IDs for Judge0
 export const LANGUAGE_IDS: Record<string, number> = {
@@ -49,7 +51,7 @@ export interface SubmissionResponse {
   memory: number;
 }
 
-const STATUS_CODES: Record<number, string> = {
+export const STATUS_CODES: Record<number, string> = {
   1: 'In Queue',
   2: 'Processing',
   3: 'Accepted',
@@ -107,11 +109,24 @@ export async function executeCode(
 
   if (onStatusUpdate) onStatusUpdate('Running...');
 
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+
+  if (JUDGE0_API_KEY) {
+    if (JUDGE0_API_HOST) {
+      headers['x-rapidapi-key'] = JUDGE0_API_KEY;
+      headers['x-rapidapi-host'] = JUDGE0_API_HOST;
+    } else {
+      headers['X-Auth-Token'] = JUDGE0_API_KEY;
+    }
+  }
+
   const response = await fetch(
     `${JUDGE0_API_URL}/submissions?base64_encoded=false&wait=true`,
     {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers,
       body: JSON.stringify(requestBody),
     }
   );

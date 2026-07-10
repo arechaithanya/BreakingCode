@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Play, Pause, SkipForward, SkipBack, RotateCcw, Eye } from 'lucide-react';
-import { analyzeCode, type AnalysisResult, type VisualizationStep } from '../../utils/codeAnalyzer';
+import { analyzeCode, type AnalysisResult } from '../../utils/codeAnalyzer';
 import ArrayVisualizer from './visualizers/ArrayVisualizer';
 import CallStackVisualizer from './visualizers/CallStackVisualizer';
 import VariableTracker from './visualizers/VariableTracker';
@@ -161,7 +161,7 @@ const CodeVisualizer: React.FC<Props> = ({ code, language, stdout, isVisible }) 
                       initial={{ opacity: 0, x: -5 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: i * 0.05 }}
-                      className={`${i === step.data.allLines.length - 1 ? 'text-green-400' : 'text-gray-400'}`}
+                      className={`${i === (step.data as any).allLines.length - 1 ? 'text-green-400' : 'text-gray-400'}`}
                     >
                       <span className="text-gray-600 select-none mr-2">{i + 1}</span>
                       {line}

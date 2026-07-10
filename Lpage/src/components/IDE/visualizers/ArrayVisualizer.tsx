@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import type { ArrayStepData } from '../../utils/codeAnalyzer';
+import type { ArrayStepData } from '../../../utils/codeAnalyzer';
 
 interface Props {
   data: ArrayStepData;
@@ -57,7 +57,7 @@ const ArrayVisualizer: React.FC<Props> = ({ data }) => {
 
       {/* Bar Chart */}
       <div className="flex-1 flex items-end gap-1 min-h-0">
-        {values.map((val, idx) => {
+        {values.map((val: number, idx: number) => {
           const heightPercent = Math.max((val / maxVal) * 100, 8);
           return (
             <motion.div
@@ -127,7 +127,7 @@ const ArrayVisualizer: React.FC<Props> = ({ data }) => {
 
       {/* Array representation */}
       <div className="mt-2 flex gap-0.5 justify-center">
-        {values.map((val, idx) => (
+        {values.map((val: number, idx: number) => (
           <motion.div
             key={idx}
             className={`px-1.5 py-0.5 text-[9px] font-mono border rounded ${

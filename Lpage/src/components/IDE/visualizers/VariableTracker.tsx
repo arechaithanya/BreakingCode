@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import type { VariableStepData } from '../../utils/codeAnalyzer';
+import type { VariableStepData } from '../../../utils/codeAnalyzer';
 
 interface Props {
   data: VariableStepData;
@@ -30,7 +30,7 @@ const VariableTracker: React.FC<Props> = ({ data }) => {
           </div>
 
           {/* Variable rows */}
-          {variables.map((v, idx) => (
+          {variables.map((v: any, idx: number) => (
             <motion.div
               key={v.name}
               initial={{ opacity: 0, x: -10 }}

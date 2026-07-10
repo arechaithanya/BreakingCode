@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Zap, Shield, Code, Bot, Eye, Globe } from 'lucide-react';
+import { ArrowLeft, Shield, Code, Bot, Eye, Globe, LayoutDashboard } from 'lucide-react';
 import breakingCodeLogo from '../assets/breaking-code-logo.jpeg';
 
 interface ChangelogEntry {
@@ -15,82 +15,83 @@ interface ChangelogEntry {
 
 const entries: ChangelogEntry[] = [
   {
-    version: 'v0.4.0',
+    version: 'v1.5.0',
+    date: 'May 2026 (Current)',
+    badge: 'new',
+    icon: <LayoutDashboard className="w-5 h-5 text-[#00ff88]" />,
+    title: 'Integrated Auth & Dashboard',
+    items: [
+      'Full migration to Supabase Auth for secure, persistent user accounts.',
+      'Launched the AntiGravity-themed dashboard with real-time analytics and problem tracking.',
+      'Implemented "Demo Mode" with bypass credentials (tester@breakingcode.com) for instant access.',
+      'Added 3D Session Time Tracker using React Three Fiber.',
+    ],
+  },
+  {
+    version: 'v1.4.0',
+    date: 'April 2026',
+    badge: 'improvement',
+    icon: <Bot className="w-5 h-5 text-purple-400" />,
+    title: 'AI Logic Analyzer Upgrade',
+    items: [
+      'Updated Gemini engine to gemini-flash-latest for 2x faster code explanations.',
+      'Integrated AI-powered syntax error analysis with one-click automated fixes.',
+      'Enhanced Live Visualizer support for Linked Lists and Recursion stacks.',
+    ],
+  },
+  {
+    version: 'v1.3.0',
     date: 'April 2026',
     badge: 'new',
-    icon: <Bot className="w-5 h-5 text-devmind-purple" />,
-    title: 'AI Code Assistant — Beta',
+    icon: <Eye className="w-5 h-5 text-[#00ff88]" />,
+    title: 'Interactive Algorithm Suite',
     items: [
-      'Introduced multi-line AI completions powered by our fine-tuned code model.',
-      'Context-aware suggestions that understand your entire open file.',
-      'One-click bug-fix proposals highlighted inline.',
+      'Added interactive sorting animations for Bubble, Selection, Insertion, Merge, and Quick Sort.',
+      'Real-time visualization of array swaps and comparisons during execution.',
+      'Integrated visualization gating with confidence-based rendering (threshold > 0.8).',
     ],
   },
   {
-    version: 'v0.3.2',
+    version: 'v1.2.0',
     date: 'March 2026',
     badge: 'improvement',
-    icon: <Zap className="w-5 h-5 text-devmind-cyan" />,
-    title: 'Compiler Performance Upgrades',
+    icon: <Code className="w-5 h-5 text-blue-400" />,
+    title: 'IDE Infrastructure Overhaul',
     items: [
-      'Average compile time reduced from 180ms to under 100ms via edge node expansion.',
-      'Introduced warm container pools for Python and Node.js — near-instant cold starts eliminated.',
-      'Memory sandbox limit raised to 4 GB on Pro plan.',
+      'Migrated to Monaco Editor core for professional-grade IntelliSense and bracket pairing.',
+      'Optimized Judge0 integration to support sandboxed execution for 50+ languages.',
+      'Refined sidebar navigation and removed legacy adaptive components for better performance.',
     ],
   },
   {
-    version: 'v0.3.0',
+    version: 'v1.1.0',
     date: 'February 2026',
-    badge: 'new',
-    icon: <Eye className="w-5 h-5 text-devmind-cyan" />,
-    title: 'Data Structure Visualizer v2',
+    badge: 'improvement',
+    icon: <Shield className="w-5 h-5 text-orange-400" />,
+    title: 'Security & Persistence',
     items: [
-      'Added graph and adjacency-matrix visualizations.',
-      'Stack & queue operations now animate push/pop transitions.',
-      'Visualizer panel is now resizable and detachable.',
+      'Implemented Row Level Security (RLS) policies for user profile data.',
+      'Added persistent coding session tracking and history syncing.',
+      'Hardened sandboxing for code execution to prevent environment leakage.',
     ],
   },
   {
-    version: 'v0.2.5',
+    version: 'v1.0.0',
     date: 'January 2026',
     badge: 'new',
-    icon: <Globe className="w-5 h-5 text-devmind-purple" />,
-    title: 'Language Expansion',
+    icon: <Globe className="w-5 h-5 text-[#00ff88]" />,
+    title: 'Public Beta Launch',
     items: [
-      'Added Zig, Elixir, Haskell, and Lua to the execution grid.',
-      'Total language support now at 50+.',
-      'Language-specific snippets and starter templates added.',
-    ],
-  },
-  {
-    version: 'v0.2.0',
-    date: 'December 2025',
-    badge: 'improvement',
-    icon: <Code className="w-5 h-5 text-devmind-cyan" />,
-    title: 'Editor Overhaul',
-    items: [
-      'Migrated editor core to Monaco for VS Code–grade IntelliSense.',
-      'Added themes: Dark (default), Monokai, One Dark.',
-      'Multi-cursor editing and bracket pair colorization enabled.',
-    ],
-  },
-  {
-    version: 'v0.1.0',
-    date: 'November 2025',
-    badge: 'new',
-    icon: <Shield className="w-5 h-5 text-devmind-purple" />,
-    title: 'Public Launch',
-    items: [
-      'Breaking Code is live! Cloud compilation for C, C++, Python, JavaScript, and Java.',
-      'Isolated sandboxed containers with AES-256 encryption.',
-      'Code snippets vault with cloud sync.',
+      'Initial release of Breaking Code landing page and core IDE environment.',
+      'Basic support for C, C++, Python, and JavaScript compilation.',
+      'Introduced "Intelligence in Every Byte" design system.',
     ],
   },
 ];
 
 const badgeStyles: Record<ChangelogEntry['badge'], string> = {
-  new: 'bg-devmind-cyan/15 text-devmind-cyan border-devmind-cyan/20',
-  improvement: 'bg-devmind-purple/15 text-devmind-purple border-devmind-purple/20',
+  new: 'bg-[#00ff88]/15 text-[#00ff88] border-[#00ff88]/20',
+  improvement: 'bg-purple-500/15 text-purple-400 border-purple-500/20',
   fix: 'bg-orange-500/15 text-orange-400 border-orange-500/20',
 };
 
@@ -98,8 +99,11 @@ const ChangelogPage: React.FC = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-devmind-dark text-white px-6 py-16 relative overflow-x-hidden">
-      <div className="react-bits-bg" />
+    <div className="min-h-screen bg-[#0a0a0a] text-white px-6 py-16 relative overflow-x-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 -right-20 w-96 h-96 bg-[#00ff88]/5 rounded-full blur-[100px]" />
+        <div className="absolute bottom-1/4 -left-20 w-96 h-96 bg-blue-500/5 rounded-full blur-[100px]" />
+      </div>
 
       <div className="max-w-2xl mx-auto relative z-10">
         {/* Header */}
@@ -110,35 +114,35 @@ const ChangelogPage: React.FC = () => {
           className="mb-14"
         >
           <button
-            onClick={() => navigate('/')}
-            className="flex items-center gap-2 text-gray-500 hover:text-devmind-cyan transition-colors text-sm mb-8"
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-gray-500 hover:text-[#00ff88] transition-colors text-sm mb-8"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Home
+            Back to Platform
           </button>
 
           <div className="flex items-center gap-4 mb-4">
             <img
               src={breakingCodeLogo}
               alt="Breaking Code logo"
-              className="h-12 w-auto rounded-xl border border-white/10 object-contain"
+              className="h-12 w-auto rounded-xl border border-white/10 object-contain shadow-[0_0_20px_rgba(0,255,136,0.1)]"
             />
             <div>
-              <p className="text-devmind-cyan text-xs tracking-[0.3em] uppercase font-medium">
-                What's New
+              <p className="text-[#00ff88] text-xs tracking-[0.3em] uppercase font-medium">
+                System Updates
               </p>
-              <h1 className="text-3xl font-bold tracking-tight">Changelog</h1>
+              <h1 className="text-3xl font-bold tracking-tight">Timeline</h1>
             </div>
           </div>
           <p className="text-gray-400 text-sm">
-            Every update, fix, and new feature — in one place.
+            Tracing every commit, feature, and architectural evolution of Breaking Code.
           </p>
         </motion.div>
 
         {/* Entries */}
         <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-[7px] top-2 bottom-2 w-[1px] bg-gradient-to-b from-devmind-cyan/40 via-white/10 to-transparent" />
+          <div className="absolute left-[7px] top-2 bottom-2 w-[1px] bg-gradient-to-b from-[#00ff88]/40 via-white/10 to-transparent" />
 
           <div className="flex flex-col gap-10 pl-8">
             {entries.map((entry, idx) => (
@@ -150,24 +154,24 @@ const ChangelogPage: React.FC = () => {
                 className="relative"
               >
                 {/* Dot */}
-                <div className="absolute -left-8 top-1 w-3.5 h-3.5 rounded-full bg-devmind-dark border-2 border-devmind-cyan/60" />
+                <div className="absolute -left-8 top-1 w-3.5 h-3.5 rounded-full bg-[#0a0a0a] border-2 border-[#00ff88]/60 shadow-[0_0_10px_rgba(0,255,136,0.3)]" />
 
-                <div className="react-bits-card p-6">
+                <div className="glass p-6 rounded-2xl border border-white/5 shadow-xl hover:border-[#00ff88]/20 transition-all group">
                   <div className="flex items-center justify-between mb-1 flex-wrap gap-2">
                     <div className="flex items-center gap-2">
                       {entry.icon}
-                      <span className="font-bold text-white">{entry.version}</span>
-                      <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border font-medium ${badgeStyles[entry.badge]}`}>
+                      <span className="font-bold text-white tracking-tight">{entry.version}</span>
+                      <span className={`text-[10px] uppercase tracking-wider px-2 py-0.5 rounded-full border font-bold ${badgeStyles[entry.badge]}`}>
                         {entry.badge}
                       </span>
                     </div>
-                    <span className="text-xs text-gray-600">{entry.date}</span>
+                    <span className="text-[11px] text-gray-600 font-mono">{entry.date}</span>
                   </div>
-                  <h3 className="text-base font-semibold text-white mb-3">{entry.title}</h3>
+                  <h3 className="text-base font-bold text-white mb-3 group-hover:text-[#00ff88] transition-colors">{entry.title}</h3>
                   <ul className="flex flex-col gap-2">
                     {entry.items.map((item, i) => (
-                      <li key={i} className="text-sm text-gray-400 flex items-start gap-2">
-                        <span className="text-devmind-cyan mt-1 shrink-0">—</span>
+                      <li key={i} className="text-sm text-gray-400 flex items-start gap-2 leading-relaxed">
+                        <span className="text-[#00ff88] mt-1.5 shrink-0 w-1 h-1 rounded-full bg-[#00ff88]" />
                         {item}
                       </li>
                     ))}
@@ -179,7 +183,7 @@ const ChangelogPage: React.FC = () => {
         </div>
 
         <p className="text-center text-gray-600 text-xs mt-14 pb-8">
-          © 2026 Breaking Code Technologies
+          © 2026 Breaking Code — All rights reserved.
         </p>
       </div>
     </div>

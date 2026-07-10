@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { ArrowRight, Anchor } from 'lucide-react';
 import type { LinkedListStepData } from '../../../utils/codeAnalyzer';
 
 interface Props {
@@ -7,133 +8,109 @@ interface Props {
 }
 
 const LinkedListVisualizer: React.FC<Props> = ({ data }) => {
-  const { name, nodes, headId, currId, action } = data;
+  const { nodes, headId, currId } = data;
 
   return (
     <div className="flex flex-col h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <span className="text-xs font-mono text-[#ff7b72]">{name}</span>
-          <span className="text-[10px] text-gray-500">
-            [{nodes.length} nodes]
-          </span>
+      <div className="flex items-center gap-2 mb-4">
+        <Anchor size={16} className="text-[#ff7b72]" />
+        <span className="text-xs font-bold text-white uppercase tracking-wider">Linked List: {data.name}</span>
+      </div>
+
+      {/* Legend */}
+      <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 bg-[#ff7b72] rounded-sm" />
+          <span className="text-[10px] text-gray-500 uppercase font-bold">Node</span>
         </div>
-        <span className={`text-[10px] px-2 py-0.5 rounded-full font-medium ${
-          action === 'traverse' ? 'bg-cyan-500/20 text-cyan-400' :
-          action === 'insert' ? 'bg-green-500/20 text-green-400' :
-          action === 'delete' ? 'bg-red-500/20 text-red-400' :
-          'bg-gray-500/20 text-gray-400'
-        }`}>
-          {action === 'init' ? 'Initialized' :
-           action === 'traverse' ? 'Traversing' :
-           action === 'insert' ? 'Inserted' :
-           action === 'delete' ? 'Deleted' : ''}
-        </span>
+        <div className="flex items-center gap-1.5">
+          <div className="w-2.5 h-2.5 bg-emerald-500 rounded-sm shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+          <span className="text-[10px] text-gray-500 uppercase font-bold">Current Pointer</span>
+        </div>
       </div>
 
       {/* Linked List visualization */}
       <div className="flex-1 flex items-center justify-start overflow-x-auto overflow-y-hidden pb-6 px-2 min-h-[120px]">
         <div className="flex items-center relative">
-          {nodes.map((node, idx) => {
+          {nodes.map((node: any) => {
             const isHead = node.id === headId;
             const isCurr = node.id === currId;
             const hasNext = !!node.nextId;
-            
+
             return (
               <React.Fragment key={node.id}>
-                {/* Node Box */}
                 <motion.div
                   layout
+                  initial={{ opacity: 0, scale: 0.8, x: -20 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
                   className="relative flex flex-col items-center"
-                  initial={{ opacity: 0, scale: 0.8, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ type: 'spring', stiffness: 300, damping: 20 }}
                 >
-                  {/* Pointers (head/curr) */}
-                  <div className="absolute -top-8 flex flex-col items-center gap-1 w-full">
+                  {/* Node Box */}
+                  <motion.div
+                    animate={{
+                      borderColor: isCurr ? '#10b981' : '#30363d',
+                      boxShadow: isCurr ? '0 0 15px rgba(16,185,129,0.3)' : 'none',
+                      y: isCurr ? -5 : 0
+                    }}
+                    className={`w-14 h-14 rounded-xl border-2 flex items-center justify-center bg-[#0d1117] relative z-10`}
+                  >
+                    <span className="text-sm font-mono font-bold text-white">{node.val}</span>
+                    
+                    {/* Head Label */}
                     {isHead && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-[9px] font-mono text-[#ff7b72] bg-[#ff7b72]/10 px-1 rounded border border-[#ff7b72]/30"
-                      >
-                        head
-                      </motion.div>
+                      <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[9px] font-bold text-[#ff7b72] uppercase tracking-tighter">
+                        Head
+                      </div>
                     )}
+
+                    {/* Current Indicator */}
                     {isCurr && (
                       <motion.div
-                        initial={{ opacity: 0, y: -5 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="text-[9px] font-mono text-cyan-400 bg-cyan-500/10 px-1 rounded border border-cyan-500/30"
+                        layoutId="curr-pointer"
+                        className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[9px] font-bold text-emerald-500 uppercase tracking-tighter"
                       >
-                        curr
+                        Curr
                       </motion.div>
                     )}
-                    {(isHead || isCurr) && (
-                      <div className="w-[1px] h-3 bg-gradient-to-b from-transparent to-gray-500" />
-                    )}
-                  </div>
+                  </motion.div>
 
-                  {/* Node UI */}
-                  <div className={`flex rounded-md border shadow-lg ${
-                    isCurr 
-                      ? 'border-cyan-500 bg-cyan-500/10 shadow-[0_0_15px_rgba(6,182,212,0.2)]' 
-                      : 'border-[#30363d] bg-[#161b22]'
-                  }`}>
-                    <div className="px-3 py-2 flex items-center justify-center border-r border-[#30363d] min-w-[40px]">
-                      <span className={`text-sm font-mono ${isCurr ? 'text-white' : 'text-gray-300'}`}>
-                        {node.val}
-                      </span>
-                    </div>
-                    <div className="px-2 py-2 flex items-center justify-center bg-[#0d1117]/50 rounded-r-md">
-                      <div className={`w-2 h-2 rounded-full ${
-                        hasNext ? (isCurr ? 'bg-cyan-400' : 'bg-gray-500') : 'bg-transparent border border-gray-600'
-                      }`} />
-                    </div>
-                  </div>
-
-                  {/* Node ID label */}
-                  <div className="absolute -bottom-5 text-[8px] text-gray-600 font-mono">
-                    {node.id}
-                  </div>
+                  {/* Node Memory Address (Mock) */}
+                  <span className="mt-2 text-[8px] font-mono text-gray-600">
+                    0x{node.id.split('-')[1] || 'A1'}
+                  </span>
                 </motion.div>
 
-                {/* Arrow to next node */}
+                {/* Arrow to Next */}
                 {hasNext && (
-                  <motion.div 
-                    layout
-                    className="flex items-center px-1"
+                  <motion.div
                     initial={{ opacity: 0, width: 0 }}
                     animate={{ opacity: 1, width: 40 }}
+                    className="flex items-center justify-center overflow-hidden"
                   >
-                    <div className={`h-[2px] w-full relative ${
-                      isCurr ? 'bg-cyan-500' : 'bg-gray-600'
-                    }`}>
-                      <div className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 border-[4px] border-transparent ${
-                        isCurr ? 'border-l-cyan-500' : 'border-l-gray-600'
-                      }`} />
-                    </div>
-                  </motion.div>
-                )}
-                
-                {/* Null pointer if tail */}
-                {!hasNext && (
-                  <motion.div 
-                    layout
-                    className="flex items-center pl-2"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                  >
-                    <div className="text-[10px] font-mono text-gray-500 ml-2 italic">
-                      null
-                    </div>
+                    <div className="h-[2px] bg-[#30363d] flex-1" />
+                    <ArrowRight size={12} className="text-[#30363d] -ml-1" />
                   </motion.div>
                 )}
               </React.Fragment>
             );
           })}
+          
+          {/* Null Terminator */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="ml-4 flex flex-col items-center"
+          >
+            <div className="w-10 h-10 rounded-lg border border-dashed border-gray-700 flex items-center justify-center bg-transparent">
+              <span className="text-[10px] font-mono font-bold text-gray-700">NULL</span>
+            </div>
+          </motion.div>
         </div>
+      </div>
+
+      {/* Logic explanation */}
+      <div className="mt-4 p-3 rounded-xl bg-white/5 border border-white/5 text-[10px] text-gray-400">
+        <p>The visualizer detects <span className="text-[#ff7b72] font-bold">ListNode</span> patterns and simulates pointer traversals based on execution flow.</p>
       </div>
     </div>
   );

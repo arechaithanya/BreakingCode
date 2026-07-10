@@ -202,7 +202,7 @@ function detectVariablePatterns(code: string, lang: string): DetectedPattern[] {
   return patterns;
 }
 
-function detectLinkedListPatterns(code: string, lang: string): DetectedPattern[] {
+function detectLinkedListPatterns(code: string, __lang: string): DetectedPattern[] {
   const patterns: DetectedPattern[] = [];
   
   // Look for ListNode class or function, or common variable names like head, curr
@@ -239,7 +239,7 @@ function detectLinkedListPatterns(code: string, lang: string): DetectedPattern[]
 
 function generateArraySteps(
   patterns: DetectedPattern[],
-  stdout: string,
+  _stdout: string,
   stepId: { current: number },
   time: { current: number }
 ): VisualizationStep[] {
@@ -513,7 +513,7 @@ function generateArraySteps(
 
 function generateRecursionSteps(
   patterns: DetectedPattern[],
-  stdout: string,
+  _stdout: string,
   stepId: { current: number },
   time: { current: number }
 ): VisualizationStep[] {
@@ -525,7 +525,7 @@ function generateRecursionSteps(
     const firstArg = args.split(',')[0]?.trim();
 
     // Try to parse the initial call from stdout or code
-    const initialN = extractInitialArg(funcName, firstArg, stdout);
+    const initialN = extractInitialArg(funcName, firstArg, _stdout);
     const maxDepth = Math.min(initialN, 8); // cap for visual sanity
 
     const frames: { name: string; args: string; depth: number; returning?: boolean }[] = [];

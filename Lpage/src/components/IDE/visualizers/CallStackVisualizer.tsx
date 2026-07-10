@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { CallStackStepData } from '../../utils/codeAnalyzer';
+import type { CallStackStepData } from '../../../utils/codeAnalyzer';
 
 interface Props {
   data: CallStackStepData;
@@ -48,7 +48,7 @@ const CallStackVisualizer: React.FC<Props> = ({ data }) => {
       {/* Stack frames */}
       <div className="flex-1 flex flex-col-reverse gap-1 overflow-auto min-h-0">
         <AnimatePresence mode="popLayout">
-          {frames.map((frame, idx) => {
+          {frames.map((frame: any, idx: number) => {
             const isTop = idx === frames.length - 1;
             const hue = 270 - frame.depth * 15;
             const borderColor = `hsl(${hue}, 60%, 50%)`;

@@ -19,19 +19,38 @@ export interface CodingEvent {
 }
 
 export interface UserProfile {
-  problemsSolved: number;
+  id: string;
+  displayName: string;
+  email: string;
+  avatarUrl?: string;
+  joinedAt: string;
+  solvedProblems: Array<{ id: string; timestamp: string }>;
+  currentStreak: number;
+  preferredLanguage: string;
+  badgesEarned: string[];
+  teamIds: string[];
+  
+  // Legacy fields (kept for compatibility or refactored)
   avgTimeMs: number;
-  topicScores: Record<string, number>; // 0-1 scale per topic
-  recentTopics: string[]; // Last 10 topics attempted
-  difficultyHistory: Difficulty[]; // Last 20 difficulties attempted
+  topicScores: Record<string, number>;
+  recentTopics: string[];
+  difficultyHistory: Difficulty[];
 }
 
 /**
  * Creates a new empty user profile
  * @returns Fresh user profile with default values
  */
-export const createEmptyProfile = (): UserProfile => ({
-  problemsSolved: 0,
+export const createEmptyProfile = (id: string = '', email: string = '', displayName: string = ''): UserProfile => ({
+  id,
+  displayName,
+  email,
+  joinedAt: new Date().toISOString(),
+  solvedProblems: [],
+  currentStreak: 0,
+  preferredLanguage: 'javascript',
+  badgesEarned: [],
+  teamIds: [],
   avgTimeMs: 0,
   topicScores: {},
   recentTopics: [],
@@ -45,7 +64,10 @@ export const createEmptyProfile = (): UserProfile => ({
  * @returns Updated user profile (immutable)
  */
 export const updateProfile = (profile: UserProfile, event: CodingEvent): UserProfile => {
-  const newProblemsSolved = profile.problemsSolved + (event.passed ? 1 : 0);
+  const isNewSolve = event.passed && !profile.solvedProblems.some(p => p.id === event.topic);
+  const newSolvedProblems = isNewSolve 
+    ? [...profile.solvedProblems, { id: event.topic, timestamp: new Date().toISOString() }]
+    : profile.solvedProblems;
   
   // Update average time (exponential moving average)
   const newAvgTimeMs = profile.avgTimeMs === 0 
@@ -65,7 +87,8 @@ export const updateProfile = (profile: UserProfile, event: CodingEvent): UserPro
   const newDifficultyHistory = [event.difficulty, ...profile.difficultyHistory.slice(0, 19)];
   
   return {
-    problemsSolved: newProblemsSolved,
+    ...profile,
+    solvedProblems: newSolvedProblems,
     avgTimeMs: newAvgTimeMs,
     topicScores: {
       ...profile.topicScores,
@@ -82,7 +105,7 @@ export const updateProfile = (profile: UserProfile, event: CodingEvent): UserPro
  * @returns Inferred skill level
  */
 export const inferSkillLevel = (profile: UserProfile): SkillLevel => {
-  if (profile.problemsSolved === 0) {
+  if (profile.solvedProblems.length === 0) {
     return 'beginner';
   }
   
@@ -95,7 +118,7 @@ export const inferSkillLevel = (profile: UserProfile): SkillLevel => {
   score += Math.min(40, topicCount * 5 + avgTopicScore * 10);
   
   // Success rate (0-30 points)
-  const successRate = profile.problemsSolved / Math.max(1, profile.difficultyHistory.length);
+  const successRate = profile.solvedProblems.length / Math.max(1, profile.difficultyHistory.length);
   score += successRate * 30;
   
   // Speed efficiency (0-20 points)
