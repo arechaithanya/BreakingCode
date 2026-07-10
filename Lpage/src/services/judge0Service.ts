@@ -4,9 +4,16 @@
  * Uses the free public instance at ce.judge0.com — no API key required.
  */
 
-const JUDGE0_API_URL = import.meta.env.VITE_JUDGE0_API_URL || 'https://ce.judge0.com';
-const JUDGE0_API_KEY = import.meta.env.VITE_JUDGE0_API_KEY || '';
-const JUDGE0_API_HOST = import.meta.env.VITE_JUDGE0_API_HOST || '';
+const rawKey = import.meta.env.VITE_JUDGE0_API_KEY || '';
+const JUDGE0_API_KEY = (rawKey && !rawKey.includes('your_') && !rawKey.includes('placeholder')) ? rawKey : '';
+
+const JUDGE0_API_URL = JUDGE0_API_KEY 
+  ? (import.meta.env.VITE_JUDGE0_API_URL || 'https://ce.judge0.com')
+  : 'https://ce.judge0.com';
+
+const JUDGE0_API_HOST = JUDGE0_API_KEY 
+  ? (import.meta.env.VITE_JUDGE0_API_HOST || '')
+  : '';
 
 // Language IDs for Judge0
 export const LANGUAGE_IDS: Record<string, number> = {
