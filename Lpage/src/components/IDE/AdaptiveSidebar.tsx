@@ -8,8 +8,7 @@
  */
 
 import React, { useMemo } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { inferSkillLevel } from '../../ml/userProfile';
+import { inferSkillLevel, createEmptyProfile } from '../../ml/userProfile';
 import { recommendProblems, explainRecommendation } from '../../ml/recommender';
 import type { Problem } from '../../ml/recommender';
 
@@ -138,15 +137,11 @@ const ProblemCard: React.FC<{ problem: Problem; explanation: string }> = ({ prob
  * Main AdaptiveSidebar component
  */
 const AdaptiveSidebar: React.FC = () => {
-  const { profile } = useAuth();
+  // Use a default guest profile — no auth required
+  const profile = createEmptyProfile('guest', 'guest@breakingcode.com', 'Guest');
 
-  const skillLevel = useMemo(() => profile ? inferSkillLevel(profile) : 'beginner', [profile]);
-  
-  const recommendations = useMemo(() => {
-    return profile ? recommendProblems(profile, 3) : [];
-  }, [profile]);
-
-  if (!profile) return null;
+  const skillLevel = useMemo(() => inferSkillLevel(profile), []);
+  const recommendations = useMemo(() => recommendProblems(profile, 3), []);
 
   return (
     <div className="w-80 bg-gray-900 border-l border-gray-800 p-4 overflow-y-auto h-full">

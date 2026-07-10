@@ -11,7 +11,7 @@ import BugFixPanel from '../components/IDE/BugFixPanel';
 import CodeVisualizer from '../components/IDE/CodeVisualizer';
 import { executeCode, formatOutput, LANGUAGE_IDS, type SubmissionResponse } from '../services/judge0Service';
 import { explainError } from '../services/aiAnalysisService';
-import { useAuth } from '../context/AuthContext';
+
 import type { Bug } from '../types/ide';
 
 // Extended AI Analysis types
@@ -71,7 +71,6 @@ console.log(fibonacci(10));`);
   // Original AI features
   const { suggestion, isLoading, clearSuggestion } = useAICompletions(code, cursorLine, language);
   const { bugs, isScanning } = useBugDetection(code, language);
-  const { recordEvent } = useAuth();
   const filteredBugs = bugs.filter(bug => !dismissedBugIds.has(bug.id));
 
   // Handle code change
@@ -167,11 +166,7 @@ console.log(fibonacci(10));`);
       // Trigger AI analysis
       analyzeCode(code, language, result);
       
-      // Record progress if user is logged in
-      if (result.status.id === 3) {
-        // We'll use the language as a proxy for topic here, or refine later
-        recordEvent(language, parseFloat(result.time || '0') * 1000, true, 'medium');
-      }
+
       
     } catch (error) {
       setOutput(`Error: ${error instanceof Error ? error.message : String(error)}`);

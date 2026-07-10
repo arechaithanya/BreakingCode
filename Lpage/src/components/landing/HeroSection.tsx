@@ -1,5 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
+import { Link } from 'react-router-dom';
 import DitherBackground from '../common/DitherBackground';
 import breakingCodeLogo from '../../assets/breaking-code-logo.jpeg';
 
@@ -50,12 +51,16 @@ const HeroSection: React.FC = () => {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <button className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-devmind-cyan transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-            Start Coding Now
-          </button>
-          <button className="px-8 py-4 glass text-white font-bold rounded-full hover:bg-white/10 transition-all">
-            See Documentation
-          </button>
+          <Link to="/ide">
+            <button className="px-8 py-4 bg-white text-black font-bold rounded-full hover:bg-devmind-cyan transition-all transform hover:scale-105 active:scale-95 shadow-[0_0_20px_rgba(255,255,255,0.3)]">
+              Start Coding Now
+            </button>
+          </Link>
+          <a href="#about">
+            <button className="px-8 py-4 glass text-white font-bold rounded-full hover:bg-white/10 transition-all">
+              See How It Works
+            </button>
+          </a>
         </div>
       </motion.div>
 

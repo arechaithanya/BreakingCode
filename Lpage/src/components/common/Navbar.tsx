@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, User as UserIcon, LogIn } from 'lucide-react';
+import { Menu, X, Code2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
 import breakingCodeLogo from '../../assets/breaking-code-logo.jpeg';
 
 const navLinks = [
@@ -12,7 +11,6 @@ const navLinks = [
 ];
 
 const Navbar: React.FC = () => {
-  const { user, profile } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -28,7 +26,6 @@ const Navbar: React.FC = () => {
     return () => container?.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close menu when a link is clicked
   const handleLinkClick = () => setMenuOpen(false);
 
   return (
@@ -73,36 +70,13 @@ const Navbar: React.FC = () => {
               </span>
             </Link>
 
-            {user ? (
-              <Link 
-                to="/dashboard" 
-                className="w-10 h-10 rounded-full border border-[#00ff88]/20 flex items-center justify-center overflow-hidden hover:border-[#00ff88]/50 transition-all group shadow-[0_0_15px_rgba(0,255,136,0.1)]"
-                title="Go to Dashboard"
-              >
-                {profile?.avatarUrl ? (
-                  <img src={profile.avatarUrl} alt="Profile" className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full bg-[#00ff88]/10 flex items-center justify-center text-[#00ff88] font-bold text-sm">
-                    {profile?.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase() || 'U'}
-                  </div>
-                )}
-              </Link>
-            ) : (
-              <div className="flex items-center gap-4">
-                <Link 
-                  to="/login"
-                  className="hidden sm:flex items-center gap-2 text-sm font-medium text-gray-400 hover:text-white transition-colors"
-                >
-                  <LogIn size={16} />
-                  Login
-                </Link>
-                <Link to="/signup">
-                  <button className="px-5 py-2 bg-[#00ff88] text-black rounded-full text-sm font-bold hover:bg-[#00dd77] transition-all shadow-[0_0_20px_rgba(0,255,136,0.2)]">
-                    Get Started
-                  </button>
-                </Link>
-              </div>
-            )}
+            {/* Open IDE CTA */}
+            <Link to="/ide">
+              <button className="flex items-center gap-2 px-5 py-2 bg-[#00ff88] text-black rounded-full text-sm font-bold hover:bg-[#00dd77] transition-all shadow-[0_0_20px_rgba(0,255,136,0.2)] hover:shadow-[0_0_30px_rgba(0,255,136,0.4)]">
+                <Code2 size={15} />
+                Open IDE
+              </button>
+            </Link>
           </div>
 
           {/* Mobile hamburger */}
@@ -148,18 +122,6 @@ const Navbar: React.FC = () => {
               </button>
 
               <nav className="flex flex-col gap-2 flex-1">
-                {user && (
-                  <Link
-                    to="/dashboard"
-                    onClick={handleLinkClick}
-                    className="flex items-center gap-3 text-lg font-bold text-[#00ff88] py-4 border-b border-[#00ff88]/10"
-                  >
-                    <div className="w-8 h-8 rounded-full bg-[#00ff88]/20 flex items-center justify-center">
-                      <UserIcon size={18} />
-                    </div>
-                    Dashboard
-                  </Link>
-                )}
                 {navLinks.map((link) => (
                   <a
                     key={link.name}
@@ -183,20 +145,12 @@ const Navbar: React.FC = () => {
                 </Link>
               </nav>
 
-              {!user ? (
-                <Link to="/signup" onClick={handleLinkClick} className="w-full">
-                  <button className="w-full py-3 bg-[#00ff88] text-black rounded-full text-sm font-bold hover:bg-[#00dd77] transition-all">
-                    Get Started
-                  </button>
-                </Link>
-              ) : (
-                <button 
-                  onClick={() => { /* signOut logic */ setMenuOpen(false); }}
-                  className="w-full py-3 glass rounded-full text-sm font-semibold text-red-400 hover:bg-red-500/5 transition-all"
-                >
-                  Logout
+              <Link to="/ide" onClick={handleLinkClick} className="w-full">
+                <button className="w-full py-3 bg-[#00ff88] text-black rounded-full text-sm font-bold hover:bg-[#00dd77] transition-all flex items-center justify-center gap-2">
+                  <Code2 size={15} />
+                  Open IDE
                 </button>
-              )}
+              </Link>
             </motion.div>
           </>
         )}
